@@ -100,6 +100,7 @@ All work flows through the **Orchestrator**.
 - **Order**: Orchestrator enforces order: *Vision → Principles → Requirements → State Machine → Scenarios*.
 - **Integrity**: Any undocumented behavior = invalid.
 - **Boundaries**: Out-of-scope is as important as in-scope.
+- **Git Commitment Policy**: AI agents MUST NOT commit changes to the Git repository unless specifically instructed by the user. All automated or implicit commits are forbidden.
 
 ---
 
