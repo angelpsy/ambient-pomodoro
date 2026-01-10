@@ -16,9 +16,20 @@ Ensure that:
 
 ---
 
+## Mandatory Reading
+Implementation Developer must read and follow:
+- `docs/00-vision.md`
+- `docs/01-principles.md`
+- `docs/02-requirements.md`
+- `docs/03-state-machine.md`
+- `docs/04-scenarios.md`
+- `docs/05-out-of-scope.md`
+- `docs/06-decisions.md`
+- `docs/07-implementation-handoff.md`
+
 ## Inputs
 Implementation Developer reads:
-- all `/docs`
+- all `/docs` (see Mandatory Reading above)
 - active task plan in `/docs/plans/`
 - accepted outputs from other agents
 

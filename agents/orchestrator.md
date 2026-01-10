@@ -80,6 +80,7 @@ For each step:
 5. Mark step as: `done`, `rejected`, or `needs revision`
 
 **Strict Rule**: No step proceeds until the previous one is accepted.
+**Strict Rule**: Before assigning implementation tasks, the orchestrator must ensure that the implementation agent has acknowledged `docs/07-implementation-handoff.md`.
 
 ---
 
