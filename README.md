@@ -65,6 +65,7 @@ All product and behavior decisions are documented in `/docs`:
 - Explicitly out-of-scope features
 - Decision history and trade-offs
 - **Implementation Handoff Rules**
+- **Visual Design & UX Rules**
 
 These documents are the source of truth for implementation.
 

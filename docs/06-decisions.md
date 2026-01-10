@@ -256,6 +256,30 @@ Calm experience is prioritized over feature completeness.
 
 ---
 
+## 13. Hybrid Background Strategy (FGS + AlarmManager)
+
+**Decision**  
+Use a `Foreground Service` while active and `AlarmManager` for signal delivery.
+
+**Alternatives considered**
+- Pure FGS (too noisy/battery heavy)
+- Pure AlarmManager (app might be killed too easily, losing UI state)
+
+**Reasoning**
+- Fits "Ambient" philosophy: notify when ready, but don't force a heavy process lock.
+- `AlarmManager` is the most reliable way to deliver a signal at zero time.
+- FGS provides the necessary persistent notification for user control (Pause/Next/Stop).
+
+**Outcome**
+- Reliable signals even after process death.
+- Respectful battery usage.
+- Predictable behavior on aggressive OEM skins.
+
+> [!CAUTION]
+> **Implementation Flexibility**: If this hybrid strategy proves to be excessively complex or causes unstable behavior during development, the Implementation Developer and System Architect may propose a simpler alternative (e.g., pure FGS), provided it does not violate the "Ambient" philosophy.
+
+---
+
 ## Review Rule
 
 If a future proposal contradicts any decision here:

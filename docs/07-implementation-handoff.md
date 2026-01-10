@@ -22,6 +22,7 @@ Implementation must be based on these documents, in order:
 5. `04-scenarios.md`
 6. `05-out-of-scope.md`
 7. `06-decisions.md`
+8. `08-visual-design.md`
 
 **If there is a conflict:**
 Vision > Principles > Decisions > Requirements > State Machine > Scenarios
@@ -64,6 +65,7 @@ The following are strictly forbidden without explicit decision update:
 - Urgent language
 - Visual emphasis after signal
 - “Productivity” framing
+- Deviating from Visual Invariants (e.g., bright colors, high-contrast, bouncy animations)
 
 ### 3.3 State Logic
 - Removing paused as a meta-state

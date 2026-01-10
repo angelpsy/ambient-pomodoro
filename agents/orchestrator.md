@@ -79,9 +79,8 @@ For each step:
 4. Validate output
 5. Mark step as: `done`, `rejected`, or `needs revision`
 
-**Strict Rule**: No step proceeds until the previous one is accepted.
 **Strict Rule**: Before assigning implementation tasks, the orchestrator must ensure that the implementation agent has acknowledged `docs/07-implementation-handoff.md`.
-**Strict Rule**: The orchestrator must never request or perform a `git commit` unless the user explicitly requested it for the current task.
+**Strict Rule**: THE ORCHESTRATOR MUST NEVER EXECUTE A COMMIT COMMAND PROACTIVELY. Even if the user says "do the task", the commit MUST be a separate user-approved step or a direct follow-up request. No exceptions.
 
 ---
 

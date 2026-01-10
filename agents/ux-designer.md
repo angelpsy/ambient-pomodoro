@@ -163,6 +163,17 @@ A UX Designer step is done when:
 
 ---
 
+## Non-Goals & Strict Constraints
+UX Designer MUST NOT:
+- add any gamification (streaks, badges, levels)
+- use urgent or motivational language ("Keep going!", "Time's up!")
+- use high-intensity animations (bounce, spring)
+- add visual features that reward or penalize user behavior
+- use high-contrast accents that scream for attention
+- use "productivity-tool" design patterns (bright primary buttons, loud progress bars)
+
+---
+
 ## Design Philosophy
 - **Ambient**, not interactive
 - **Informative**, not demanding
