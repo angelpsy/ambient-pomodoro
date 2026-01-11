@@ -217,7 +217,21 @@ Logs exist only for debugging, not for user insight.
 
 ---
 
-## 11. Android-Only for V0
+## 11. Manual Cycle Increments
+
+**Decision**  
+Focus cycles increment only when the user manually switches from Focus to another mode.
+
+**Reasoning**  
+Aligns with "The user decides" principle. Reaching the time limit triggers a signal, but completing a cycle is a conscious user decision.
+
+**Outcome**  
+- System never increments cycles automatically.
+- User can "over-focus" and still count it as one cycle.
+
+---
+
+## 12. Elapsed Time Display
 
 **Decision**  
 V0 targets Android only.

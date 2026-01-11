@@ -31,14 +31,13 @@ It only reflects system state.
 
 ---
 
-### 2.2 Paused State
-
 | Property | Value |
 |--------|-------|
 | Type | Meta-state |
 | Wraps | focus, break, long-break |
 | Resume behavior | Returns to wrapped state |
 | Time behavior | Preserves elapsed and remaining time |
+| Display focus | Elapsed time since mode start |
 
 ---
 
@@ -95,12 +94,10 @@ It only reflects system state.
 
 ---
 
-### 5.2 From `focus`
-
 | Event | Target State | Notes |
 |------|--------------|-------|
 | TICK | focus | Update time |
-| TIME_ELAPSED | focus | Emit signal, increment cycleCount |
+| TIME_ELAPSED | focus | Emit signal (sound/notification) |
 | PAUSE | paused | Save previousMode |
 | STOP | idle | Reset all |
 | NEXT_MODE | break | If cycleCount % 4 ≠ 0 |
@@ -158,14 +155,12 @@ Signal rules:
 
 ---
 
-## 7. Cycle Counter Rules
-
 | Rule | Description |
 |-----|-------------|
-| Increment | On TIME_ELAPSED in focus |
+| Increment | When transitioning OUT of `focus` mode via user action (`NEXT_MODE`, etc.) |
 | Reset | After long-break completion |
 | Reset | On STOP |
-| Manual switch | Does not affect counter |
+| Auto-increment | NOT SUPPORTED. All cycle progress depends on user decision. |
 
 ---
 

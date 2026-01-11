@@ -45,16 +45,16 @@
 - [ ] Predictable degradation if background restricted
 - [ ] **Optional (Behind Flag)**: Foreground service when timer active.
 
-### 3. Notifications & Sound
-- [ ] Notification channels (low importance)
-- [ ] Single soft sound
-- [ ] Notification actions: Pause, Resume, Next mode, Stop.
-- [ ] Text per mode: "Focus", "Break", "Long break".
+### 3. Notifications### 1. Core
+- [x] Core FSM (idle/focus/break/cycle logic)
+- [ ] Hybrid scheduling (JS Engine + Android AlarmManager)
+- [ ] Notifications logic (JS ↔ Native signals)
+- [ ] Soft ambient sound player
 
-### 4. React Native UI (Minimal)
-- [ ] Single main screen.
-- [ ] Header actions:
-    - [ ] Log Viewer access button.
+### 2. UI/UX
+- [x] Minimal React Native UI (display mode/time, controls, no settings screen)
+- [x] Log levels switcher in UI
+- [ ] In-app Log Viewer (separate header button/screen)
     - [ ] Log Level switcher (Debug/Info/Error).
 - [ ] Display: Current mode, elapsed / remaining time.
 - [ ] Controls: Start, Pause / Resume, Next, Stop.
