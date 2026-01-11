@@ -1,0 +1,140 @@
+# Technical Roadmap — Ambient Pomodoro
+
+---
+
+## Roadmap Principle
+> Each version must feel calmer than the previous one.
+> If a feature makes the app feel busier, it does not belong — regardless of how useful it seems.
+
+---
+
+## Phase 0 — Foundations (pre-V0)
+**Goal**: Create a sustainable skeleton to avoid future technical debt.
+
+### 1. Core
+- [ ] Define native timer engine boundary
+- [ ] Define FSM interfaces (events, state, side effects)
+- [ ] Decide timestamp-based timing model
+- [ ] Define logging strategy (levels, sinks)
+
+### 2. Android
+- [ ] Create notification channels
+- [ ] Decide alarm strategy (AlarmManager)
+- [ ] Decide foreground service usage rules
+
+**Risk mitigated**: Architectural drift.
+
+---
+
+## V0 — Ambient Pomodoro (Initial Release)
+**Goal**: Reliable, unobtrusive timer with minimal UX.
+
+### 1. Core Timer Engine (Native)
+- [ ] Implement FSM (per [03-state-machine.md](file:///Users/aalekseev042/Documents/projects/pet/ambient-pomodoro/docs/03-state-machine.md))
+- [ ] Implement cycle counter (focus → break → long-break)
+- [ ] Timestamp-based elapsed / remaining calculation
+- [ ] Pause / resume semantics
+- [ ] Manual mode switching
+- [ ] Stop & reset logic
+- **Artifacts**: Pure Kotlin module, no UI dependencies.
+
+### 2. Scheduling & Background
+- [ ] AlarmManager scheduling for signals
+- [ ] Repeat signal logic (if ignored)
+- [ ] Alarm cancellation on pause / stop
+- [ ] Predictable degradation if background restricted
+- [ ] **Optional (Behind Flag)**: Foreground service when timer active.
+
+### 3. Notifications & Sound
+- [ ] Notification channels (low importance)
+- [ ] Single soft sound
+- [ ] Notification actions: Pause, Resume, Next mode, Stop.
+- [ ] Text per mode: "Focus", "Break", "Long break".
+
+### 4. React Native UI (Minimal)
+- [ ] Single main screen.
+- [ ] Display: Current mode, elapsed / remaining time.
+- [ ] Controls: Start, Pause / Resume, Next, Stop.
+- [ ] No settings screen.
+- [ ] Keep screen on (optional toggle).
+
+### 5. Logging & Debug
+- [ ] Log levels: debug / info / error.
+- [ ] In-app log viewer (hidden / minimal).
+- [ ] Ability to switch log level.
+
+### 6. QA & Validation
+- [ ] Scenario-based manual testing ([04-scenarios.md](file:///Users/aalekseev042/Documents/projects/pet/ambient-pomodoro/docs/04-scenarios.md)).
+- [ ] Kill app / background tests.
+- [ ] OEM behavior spot-check (Samsung / Pixel).
+
+---
+
+## V1 — Stability & UX Refinement
+**Goal**: Make the product "reliable and polished."
+
+### 1. UX Improvements
+- [ ] Refined visual language.
+- [ ] Better typography tuning.
+- [ ] Subtle progress visualization.
+- [ ] Mode-specific accent tuning.
+
+### 2. Timer Configuration
+- [ ] Adjustable durations: focus, break, long break.
+- [ ] Adjustable cycle count.
+- [ ] Defaults preserved.
+
+### 3. Multi-Timer Support (Optional)
+- [ ] Timer presets (not concurrent).
+- [ ] Last-used timer on main screen.
+- [ ] Simple naming.
+
+### 4. Background Behavior Improvements
+- [ ] Smarter foreground service usage.
+- [ ] User education (why notification exists).
+- [ ] Battery optimization hints (non-intrusive).
+
+### 5. Robustness
+- [ ] Better state persistence.
+- [ ] Restore timer after process death (best effort).
+- [ ] Improved error logging.
+
+---
+
+## Future / Exploratory (Not Committed)
+*These are ideas, not promises.*
+
+### Ambient Enhancements
+- Adaptive signal volume (based on environment).
+- Sound design exploration.
+- Visual dimming modes.
+
+### UX Experiments
+- Minimal always-on display mode.
+- Lock-screen awareness.
+- “Glanceable” widget.
+
+### Platform Expansion
+- iOS version.
+- Desktop companion.
+- Wearable companion.
+
+### Advanced (Careful)
+- Multiple concurrent timers (high risk).
+- Context-aware suggestions.
+- Calendar awareness.
+
+---
+
+## Explicit Non-Goals (Carry Forward)
+- No gamification.
+- No productivity metrics.
+- No streaks.
+- No behavioral pressure.
+
+---
+
+## How to Use This Roadmap
+- **Orchestrator**: Task decomposition.
+- **Developer**: Sequencing work.
+- **Product**: Deciding what not to do.
