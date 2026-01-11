@@ -138,7 +138,17 @@ QA should:
 
 ---
 
-## 9. Final Principle
+## 10. Roadmap Protocol
+Implementation is never an isolated event. It is a step in the roadmap.
+
+1.  **Reference**: Every task plan (`task-XXX.md`) must link to a specific Roadmap phase/item.
+2.  **Continuous Updates**: As work progresses, the Roadmap should reflect the current focus.
+3.  **Handoff**: A task is only considered complete when its result is marked in `09-roadmap.md`.
+4.  **Feedback**: If implementation discovers architectural issues, the first action is to propose a Roadmap adjustment.
+
+---
+
+## 11. Final Principle
 > If a change makes the app feel more “productive” it is probably wrong.
 
 Ambient Pomodoro is successful when it stays out of the way.

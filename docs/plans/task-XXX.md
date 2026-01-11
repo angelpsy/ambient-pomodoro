@@ -5,6 +5,7 @@
 - Type: feature | change | clarification | doc-only | technical
 - Priority: low | medium | high
 - Risk: low | medium | high
+- Roadmap Link: [docs/09-roadmap.md phase/item]
 - Created by: Orchestrator
 - Date: YYYY-MM-DD
 

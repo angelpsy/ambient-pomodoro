@@ -107,7 +107,15 @@ Orchestrator tracks:
 
 ---
 
-### 6. Plan Adjustment
+### 6. Roadmap Management
+The orchestrator is the guardian of `docs/09-roadmap.md`.
+- **Pre-flight**: Before creating any task, check the roadmap to ensure the next item is logically ready.
+- **Post-flight**: After a task is completed, update the corresponding roadmap checkbox.
+- **Decision Loop**: If a task reveals it is impossible or contradicts the roadmap, pause and route to the **Product Analyst** for a roadmap revision.
+
+---
+
+### 7. Plan Adjustment
 Orchestrator may adjust the plan if:
 - a dependency is missing
 - a conflict is discovered
@@ -143,8 +151,9 @@ If an agent produces output outside their role, introduces undocumented behavior
 
 ## Definition of Done (Task Level)
 A task is complete when:
-- All plan steps are marked **done**.
+- All steps and tasks are marked **done**.
 - All expected artifacts **exist**.
+- **Roadmap Updated**: The relevant line in `docs/09-roadmap.md` is checked.
 - No open validation issues remain.
 - No undocumented decisions were made.
 
