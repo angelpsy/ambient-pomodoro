@@ -53,15 +53,17 @@
 
 ### 4. React Native UI (Minimal)
 - [ ] Single main screen.
+- [ ] Header actions:
+    - [ ] Log Viewer access button.
+    - [ ] Log Level switcher (Debug/Info/Error).
 - [ ] Display: Current mode, elapsed / remaining time.
 - [ ] Controls: Start, Pause / Resume, Next, Stop.
 - [ ] No settings screen.
-- [ ] Keep screen on (optional toggle).
 
 ### 5. Logging & Debug
 - [ ] Log levels: debug / info / error.
-- [ ] In-app log viewer (hidden / minimal).
-- [ ] Ability to switch log level.
+- [ ] In-app log viewer (accessible from header).
+- [ ] Interactivity: Switch log levels on the fly.
 
 ### 6. QA & Validation
 - [ ] Scenario-based manual testing ([04-scenarios.md](file:///Users/aalekseev042/Documents/projects/pet/ambient-pomodoro/docs/04-scenarios.md)).
