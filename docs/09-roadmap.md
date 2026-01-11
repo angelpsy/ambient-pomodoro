@@ -12,15 +12,15 @@
 **Goal**: Create a sustainable skeleton to avoid future technical debt.
 
 ### 1. Core
-- [ ] Define native timer engine boundary
-- [ ] Define FSM interfaces (events, state, side effects)
-- [ ] Decide timestamp-based timing model
-- [ ] Define logging strategy (levels, sinks)
+- [x] Define native timer engine boundary
+- [x] Define FSM interfaces (events, state, side effects)
+- [x] Decide timestamp-based timing model
+- [x] Define logging strategy (levels, sinks)
 
 ### 2. Android
-- [ ] Create notification channels
-- [ ] Decide alarm strategy (AlarmManager)
-- [ ] Decide foreground service usage rules
+- [x] Create notification channels
+- [x] Decide alarm strategy (AlarmManager)
+- [x] Decide foreground service usage rules
 
 **Risk mitigated**: Architectural drift.
 
