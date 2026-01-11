@@ -144,7 +144,8 @@ Implementation is never an isolated event. It is a step in the roadmap.
 1.  **Reference**: Every task plan (`task-XXX.md`) must link to a specific Roadmap phase/item.
 2.  **Continuous Updates**: As work progresses, the Roadmap should reflect the current focus.
 3.  **Handoff**: A task is only considered complete when its result is marked in `09-roadmap.md`.
-4.  **Feedback**: If implementation discovers architectural issues, the first action is to propose a Roadmap adjustment.
+4.  **Implicit Commit Ban**: Committing is NEVER part of a task's internal logic. It is always a formal "checkpoint" that requires a separate user acknowledgment after viewing the implementation summary.
+5.  **Feedback**: If implementation discovers architectural issues, the first action is to propose a Roadmap adjustment.
 
 ---
 

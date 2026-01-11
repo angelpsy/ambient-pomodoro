@@ -80,7 +80,11 @@ For each step:
 5. Mark step as: `done`, `rejected`, or `needs revision`
 
 **Strict Rule**: Before assigning implementation tasks, the orchestrator must ensure that the implementation agent has acknowledged `docs/07-implementation-handoff.md`.
-**Strict Rule**: THE ORCHESTRATOR MUST NEVER EXECUTE A COMMIT COMMAND PROACTIVELY. Even if the user says "do the task", the commit MUST be a separate user-approved step or a direct follow-up request. No exceptions.
+**Strict Rule (ZERO PROACTIVITY)**: THE ORCHESTRATOR MUST NEVER EXECUTE A COMMIT COMMAND PROACTIVELY. 
+- **Parallelization Prohibition**: It is FORBIDDEN to combine a `git commit` tool call with a `notify_user` call asking for permission. 
+- **Sequence**: 1. Perform work → 2. `notify_user` (ask permission) → 3. **WAIT FOR USER RESPONSE** → 4. Execute commit (in the next turn). 
+- Even if the user says "do the task", the commit is still a separate step that requires explicit confirmation of the *content* and *message*. 
+- **No exceptions.** Breaking this rule is a failure of agent integrity.
 
 ---
 
