@@ -7,11 +7,18 @@ import { logStore } from './LogStore';
  * Can be extended with file sinks or other targets in the future.
  */
 class LoggerImpl implements ILogger {
-    private currentLevel: LogLevel = LogLevel.INFO;
+    private currentLevel: LogLevel = LogLevel.WARN;
+
+    constructor() {
+        // Initial app start log
+        this.warn('App started (Logger initialized)');
+    }
 
     setLevel(level: LogLevel): void {
+        const oldLevel = this.currentLevel;
         this.currentLevel = level;
-        this.info(`Log level changed to: ${level}`);
+        // Log at WARN or ERROR to ensure it's captured in the persistent log often
+        this.warn(`Log level changed: ${oldLevel} -> ${level}`);
     }
 
     getLevel(): LogLevel {

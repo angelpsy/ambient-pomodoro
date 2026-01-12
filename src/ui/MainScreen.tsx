@@ -6,9 +6,15 @@ import { Controls } from './components/Controls';
 import { LogViewer } from './components/LogViewer';
 import { TimerMode } from '../core/types';
 
+import { logStore } from '../core/LogStore';
+
 export const MainScreen: React.FC = () => {
     const { currentMode, elapsedTime, cycleCount } = useTimer();
     const [logsVisible, setLogsVisible] = React.useState(false);
+
+    React.useEffect(() => {
+        logStore.initialize();
+    }, []);
 
     const getModeLabel = (mode: TimerMode) => {
         switch (mode) {
