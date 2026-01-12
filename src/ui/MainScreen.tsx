@@ -1,13 +1,14 @@
 import React from 'react';
-import { StyleSheet, Text, View, Platform, StatusBar } from 'react-native';
+import { StyleSheet, Text, View, Platform, StatusBar, TouchableOpacity } from 'react-native';
 import { useTimer } from './useTimer';
 import { formatTime } from './utils';
 import { Controls } from './components/Controls';
-import { LogSwitcher } from './components/LogSwitcher';
+import { LogViewer } from './components/LogViewer';
 import { TimerMode } from '../core/types';
 
 export const MainScreen: React.FC = () => {
     const { currentMode, elapsedTime, cycleCount } = useTimer();
+    const [logsVisible, setLogsVisible] = React.useState(false);
 
     const getModeLabel = (mode: TimerMode) => {
         switch (mode) {
@@ -27,8 +28,20 @@ export const MainScreen: React.FC = () => {
                     <Text style={styles.appName}>Ambient Pomodoro</Text>
                     <Text style={styles.cycleText}>Cycle: {cycleCount}</Text>
                 </View>
-                <LogSwitcher />
+                <View style={styles.headerRight}>
+                    <TouchableOpacity
+                        style={styles.viewLogsButton}
+                        onPress={() => setLogsVisible(true)}
+                    >
+                        <Text style={styles.viewLogsText}>VIEW LOGS</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
+
+            <LogViewer
+                visible={logsVisible}
+                onClose={() => setLogsVisible(false)}
+            />
 
             <View style={styles.mainContent}>
                 <Text style={styles.modeLabel}>{getModeLabel(currentMode)}</Text>
@@ -62,6 +75,24 @@ const styles = StyleSheet.create({
     cycleText: {
         color: '#888888',
         fontSize: 14,
+    },
+    headerRight: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    viewLogsButton: {
+        marginRight: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        backgroundColor: '#1E1E1E',
+        borderRadius: 4,
+        borderWidth: 1,
+        borderColor: '#333333',
+    },
+    viewLogsText: {
+        color: '#666666',
+        fontSize: 10,
+        fontWeight: 'bold',
     },
     mainContent: {
         flex: 1,

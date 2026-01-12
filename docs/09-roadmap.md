@@ -54,15 +54,15 @@
 ### 2. UI/UX
 - [x] Minimal React Native UI (display mode/time, controls, no settings screen)
 - [x] Log levels switcher in UI
-- [ ] In-app Log Viewer (separate header button/screen)
-    - [ ] Log Level switcher (Debug/Info/Error).
+- [x] In-app Log Viewer (separate header button)
+    - [x] Log Level switcher (centralized in Viewer).
 - [ ] Display: Current mode, elapsed / remaining time.
 - [ ] Controls: Start, Pause / Resume, Next, Stop.
 - [ ] No settings screen.
 
 ### 5. Logging & Debug
-- [ ] Log levels: debug / info / error.
-- [ ] In-app log viewer (accessible from header).
+- [x] Log levels: debug / info / error.
+- [x] In-app log viewer (accessible from header).
 - [ ] Interactivity: Switch log levels on the fly.
 
 ### 6. QA & Validation

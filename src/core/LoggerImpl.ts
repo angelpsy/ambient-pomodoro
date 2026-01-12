@@ -1,5 +1,6 @@
 import { ILogger } from './Logger';
 import { LogLevel } from './types';
+import { logStore } from './LogStore';
 
 /**
  * Basic console logger implementation for Phase 0.
@@ -24,25 +25,33 @@ class LoggerImpl implements ILogger {
 
     debug(message: string, ...args: any[]): void {
         if (this.shouldLog(LogLevel.DEBUG)) {
-            console.debug(`[DEBUG] ${message}`, ...args);
+            const formatted = args.length > 0 ? `${message} ${args.map(a => JSON.stringify(a)).join(' ')}` : message;
+            console.debug(`[DEBUG] ${formatted}`);
+            logStore.addLog(LogLevel.DEBUG, formatted);
         }
     }
 
     info(message: string, ...args: any[]): void {
         if (this.shouldLog(LogLevel.INFO)) {
-            console.info(`[INFO] ${message}`, ...args);
+            const formatted = args.length > 0 ? `${message} ${args.map(a => JSON.stringify(a)).join(' ')}` : message;
+            console.info(`[INFO] ${formatted}`);
+            logStore.addLog(LogLevel.INFO, formatted);
         }
     }
 
     warn(message: string, ...args: any[]): void {
         if (this.shouldLog(LogLevel.WARN)) {
-            console.warn(`[WARN] ${message}`, ...args);
+            const formatted = args.length > 0 ? `${message} ${args.map(a => JSON.stringify(a)).join(' ')}` : message;
+            console.warn(`[WARN] ${formatted}`);
+            logStore.addLog(LogLevel.WARN, formatted);
         }
     }
 
     error(message: string, ...args: any[]): void {
         if (this.shouldLog(LogLevel.ERROR)) {
-            console.error(`[ERROR] ${message}`, ...args);
+            const formatted = args.length > 0 ? `${message} ${args.map(a => JSON.stringify(a)).join(' ')}` : message;
+            console.error(`[ERROR] ${formatted}`);
+            logStore.addLog(LogLevel.ERROR, formatted);
         }
     }
 }
