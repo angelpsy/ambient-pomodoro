@@ -30,25 +30,25 @@
 **Goal**: Reliable, unobtrusive timer with minimal UX.
 
 ### 1. Core Timer Engine (Native)
-- [ ] Implement FSM (per [03-state-machine.md](file:///Users/aalekseev042/Documents/projects/pet/ambient-pomodoro/docs/03-state-machine.md))
-- [ ] Implement cycle counter (focus → break → long-break)
-- [ ] Timestamp-based elapsed / remaining calculation
-- [ ] Pause / resume semantics
-- [ ] Manual mode switching
-- [ ] Stop & reset logic
+- [x] Implement FSM (per [03-state-machine.md](file:///Users/aalekseev042/Documents/projects/pet/ambient-pomodoro/docs/03-state-machine.md))
+- [x] Implement cycle counter (focus → break → long-break)
+- [x] Timestamp-based elapsed / remaining calculation
+- [x] Pause / resume semantics
+- [x] Manual mode switching
+- [x] Stop & reset logic
 - **Artifacts**: Pure Kotlin module, no UI dependencies.
 
 ### 2. Scheduling & Background
-- [ ] AlarmManager scheduling for signals
-- [ ] Repeat signal logic (if ignored)
-- [ ] Alarm cancellation on pause / stop
-- [ ] Predictable degradation if background restricted
+- [x] AlarmManager scheduling for signals
+- [x] Repeat signal logic (if ignored)
+- [x] Alarm cancellation on pause / stop
+- [x] Predictable degradation if background restricted
 - [ ] **Optional (Behind Flag)**: Foreground service when timer active.
 
 ### 3. Notifications### 1. Core
 - [x] Core FSM (idle/focus/break/cycle logic)
-- [ ] Hybrid scheduling (JS Engine + Android AlarmManager)
-- [ ] Notifications logic (JS ↔ Native signals)
+- [x] Hybrid scheduling (JS Engine + Android AlarmManager)
+- [x] Notifications logic (JS ↔ Native signals)
 - [ ] Soft ambient sound player
 
 ### 2. UI/UX

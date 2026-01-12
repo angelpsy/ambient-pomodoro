@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { TimerContext as ITimerContext, TimerMode } from '../core/types';
+import { TimerContext as ITimerContext } from '../core/types';
 import { TimerEngineImpl } from '../core/TimerEngineImpl';
 import { ITimerEngine } from '../core/TimerEngine';
 

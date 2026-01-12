@@ -67,3 +67,8 @@ We have successfully built the "source of truth" layer. All agents have roles, a
 
 #### C. First Implementation Plan
 - [ ] **Task Plan 001**: "Project Initialization & Core Timer Engine".
+---
+
+## Maintenance Notes
+
+- [ ] **Timer Durations**: Revert default timer durations to 25 minutes (focus) and 5 minutes (break) before production release. Currently set to shorter values for development testing.

@@ -1,20 +1,25 @@
 import {
     TimerContext,
     TimerMode,
-    TimerEvent,
     TimerListener,
 } from './types';
 import { ITimerEngine } from './TimerEngine';
 import { logger } from './LoggerImpl';
+import { nativeTimer } from './NativeTimer';
+import { NativeEventEmitter, NativeModules } from 'react-native';
+
+const { TimerNativeModule } = NativeModules;
+// Safety: In some environments (e.g. tests or early boot), Module might be null
+const timerEmitter = TimerNativeModule ? new NativeEventEmitter(TimerNativeModule) : null;
 
 /**
  * Durations in milliseconds for V0.
  * As per docs/02-requirements.md
  */
 const DURATIONS = {
-    [TimerMode.FOCUS]: 25 * 60 * 1000,
-    [TimerMode.BREAK]: 5 * 60 * 1000,
-    [TimerMode.LONG_BREAK]: 15 * 60 * 1000,
+    [TimerMode.FOCUS]: 25 * 1000,
+    [TimerMode.BREAK]: 5 * 1000,
+    [TimerMode.LONG_BREAK]: 15 * 1000,
     [TimerMode.IDLE]: 0,
     [TimerMode.PAUSED]: 0,
 };
@@ -31,6 +36,22 @@ export class TimerEngineImpl implements ITimerEngine {
             remainingTime: 0,
             cycleCount: 0,
         };
+
+        // Listen for native events (from notification actions)
+        timerEmitter?.addListener('onTimerNext', () => {
+            logger.info('Received onTimerNext from native');
+            this.next();
+        });
+
+        // Listen for when a native alarm actually fires
+        timerEmitter?.addListener('onAlarmFired', (data: any) => {
+            logger.info(`Native alarm fired for: ${data.mode}`);
+            // If we are still in this mode, schedule the next nagging reminder
+            if (this.context.currentMode === data.mode) {
+                this.scheduleNextReminder();
+            }
+        });
+
         logger.info('TimerEngine initialized in IDLE mode');
     }
 
@@ -61,16 +82,16 @@ export class TimerEngineImpl implements ITimerEngine {
     }
 
     public pause(): void {
-        if (this.context.currentMode === TimerMode.IDLE || this.context.currentMode === TimerMode.PAUSED) {
-            return;
-        }
+        if (this.context.currentMode === TimerMode.PAUSED) return;
 
         this.stopTicking();
         this.context.previousMode = this.context.currentMode;
         this.context.currentMode = TimerMode.PAUSED;
-        this.context.targetTimestamp = undefined;
 
-        logger.info(`Timer PAUSED from ${this.context.previousMode}`);
+        // Cancel native alarm on pause
+        nativeTimer.cancelAlarm().catch((e: any) => logger.error(`Failed to cancel alarm: ${e}`));
+
+        logger.info('Timer PAUSED');
         this.emitChange();
     }
 
@@ -92,7 +113,6 @@ export class TimerEngineImpl implements ITimerEngine {
     }
 
     public stop(): void {
-        logger.info('Timer STOPPED and RESET');
         this.stopTicking();
         this.context = {
             currentMode: TimerMode.IDLE,
@@ -100,6 +120,11 @@ export class TimerEngineImpl implements ITimerEngine {
             remainingTime: 0,
             cycleCount: 0,
         };
+
+        // Cancel native alarm on stop
+        nativeTimer.cancelAlarm().catch((e: any) => logger.error(`Failed to cancel alarm: ${e}`));
+
+        logger.info('Timer STOPPED and RESET');
         this.emitChange();
     }
 
@@ -160,7 +185,24 @@ export class TimerEngineImpl implements ITimerEngine {
         this.context.previousMode = undefined;
         this.context.elapsedTime = 0;
         this.context.remainingTime = duration;
-        this.context.targetTimestamp = Date.now() + duration;
+        this.context.nextReminderTimestamp = undefined;
+
+        if (mode === TimerMode.IDLE) {
+            this.context.targetTimestamp = undefined;
+            nativeTimer.cancelAlarm().catch((e: any) => logger.error(`Failed to cancel alarm: ${e}`));
+        } else {
+            const target = Date.now() + duration;
+            this.context.targetTimestamp = target;
+
+            // Native scheduling: set alarm for the end of the duration
+            // Note: For initial transitions, we use the exact duration.
+            // Frequency constraints (e.g. 1min) only apply to reminders (Task 004 nagging).
+            nativeTimer.scheduleAlarm(target, mode)
+                .catch((e: any) => logger.error(`Failed to schedule alarm: ${e}`));
+        }
+
+        // Clear any old notifications when transitioning to a new mode
+        nativeTimer.clearSignalNotification().catch((e: any) => logger.error(`Failed to clear notification: ${e}`));
 
         // Reset cycle count logic as per docs/03-state-machine.md
         if (mode === TimerMode.FOCUS && prev === TimerMode.LONG_BREAK) {
@@ -201,7 +243,6 @@ export class TimerEngineImpl implements ITimerEngine {
         const duration = DURATIONS[this.context.currentMode];
         const remaining = duration - elapsed;
 
-        // Check if transition from positive to negative remaining time just happened (for signal)
         const crossedZero = this.context.remainingTime > 0 && remaining <= 0;
 
         this.context.remainingTime = remaining;
@@ -216,7 +257,26 @@ export class TimerEngineImpl implements ITimerEngine {
 
     private handleTimeElapsed(): void {
         logger.info(`TIME_ELAPSED in mode: ${this.context.currentMode}. User signal triggered.`);
-        // In V0, we don't auto-increment cycles here anymore. 
-        // We only trigger signals (to be implemented in Task 004).
+        // In V0, we don't auto-increment cycles. 
+        // We schedule the NEXT reminder using the current mode duration.
+        this.scheduleNextReminder();
+    }
+
+    private scheduleNextReminder(): void {
+        const mode = this.context.currentMode;
+        if (mode === TimerMode.IDLE || mode === TimerMode.PAUSED) return;
+
+        // Constraint: not more often than once a minute
+        const modeDuration = DURATIONS[mode];
+        const reminderInterval = Math.max(modeDuration, 60 * 1000);
+
+        const nextTime = Date.now() + reminderInterval;
+
+        logger.info(`Scheduling next reminder for ${mode} in ${reminderInterval}ms (mode duration: ${modeDuration}ms)`);
+        this.context.nextReminderTimestamp = nextTime;
+
+        // Schedule next exact alarm
+        nativeTimer.scheduleAlarm(nextTime, mode)
+            .catch((e: any) => logger.error(`Failed to schedule reminder alarm: ${e}`));
     }
 }

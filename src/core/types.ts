@@ -33,6 +33,7 @@ export interface TimerContext {
     remainingTime: number; // Milliseconds until next signal
     cycleCount: number; // Focus sessions completed since last long-break
     targetTimestamp?: number; // Performance.now() or timestamp of intended completion
+    nextReminderTimestamp?: number; // When to send the next "nagging" signal if in overtime
 }
 
 export type TimerListener = (context: TimerContext) => void;

@@ -11,6 +11,23 @@ export interface NativeTimerBridge {
     scheduleSignal(timestamp: number, mode: string): Promise<void>;
 
     /**
+   * Schedules a native alarm/signal.
+   * @param timestamp Absolute time in ms when to trigger.
+   * @param mode The timer mode that is ending.
+   */
+    scheduleAlarm(timestamp: number, mode: string): Promise<void>;
+
+    /**
+   * Cancels any pending native alarms.
+   */
+    cancelAlarm(): Promise<void>;
+
+    /**
+   * Clears any active timer-related notifications.
+   */
+    clearSignalNotification(): Promise<void>;
+
+    /**
      * Cancel any pending signals.
      */
     cancelSignal(): Promise<void>;
