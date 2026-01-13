@@ -18,9 +18,9 @@ const timerEmitter = TimerNativeModule ? new NativeEventEmitter(TimerNativeModul
  * As per docs/02-requirements.md
  */
 const DURATIONS = {
-    [TimerMode.FOCUS]: 25 * 1000,
-    [TimerMode.BREAK]: 5 * 1000,
-    [TimerMode.LONG_BREAK]: 15 * 1000,
+    [TimerMode.FOCUS]: 25 * 60 * 1000,
+    [TimerMode.BREAK]: 5 * 60 * 1000,
+    [TimerMode.LONG_BREAK]: 15 * 60 * 1000,
     [TimerMode.IDLE]: 0,
     [TimerMode.PAUSED]: 0,
 };

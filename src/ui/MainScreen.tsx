@@ -52,9 +52,8 @@ export const MainScreen: React.FC = () => {
             <View style={styles.mainContent}>
                 <Text style={styles.modeLabel}>{getModeLabel(currentMode)}</Text>
                 <Text style={styles.timerText}>{formatTime(elapsedTime)}</Text>
+                <Controls />
             </View>
-
-            <Controls />
         </View>
     );
 };
