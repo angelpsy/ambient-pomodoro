@@ -88,6 +88,40 @@ Implementation details are secondary to behavior and UX principles.
 
 ---
 
+## Development
+
+### Prerequisites
+- Node.js >= 20
+- Java JDK 11-17
+- Android Studio & SDK
+- Watchman (recommended)
+
+### Running locally
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Start Metro bundler:
+   ```bash
+   npm start
+   ```
+3. Run on Android emulator/device:
+   ```bash
+   npm run android
+   ```
+
+## Production Build
+
+To build a release APK (signed with debug key for side-loading):
+
+```bash
+cd android
+./gradlew assembleRelease
+```
+Artifact location: `android/app/build/outputs/apk/release/app-release.apk`
+
+---
+
 ## Philosophy in one sentence
 Ambient Pomodoro helps you stay aware of time
 without telling you how to work.
