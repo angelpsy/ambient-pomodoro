@@ -16,7 +16,11 @@ class FileStorageNativeModule(reactContext: ReactApplicationContext) : ReactCont
     }
 
     private fun getFile(filename: String): File {
-        return File(reactApplicationContext.filesDir, filename)
+        val file = File(reactApplicationContext.filesDir, filename)
+        if (!file.canonicalPath.startsWith(reactApplicationContext.filesDir.canonicalPath)) {
+            throw SecurityException("Invalid filename: $filename. Path traversal detected.")
+        }
+        return file
     }
 
     @ReactMethod
