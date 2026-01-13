@@ -19,6 +19,11 @@
 
 ---
 
+## Feature Decisions & Simplifications
+
+- **Ambient Sound**: Decided to skip continuous ambient background sound for V0/V2. The app will rely solely on notification sounds for timer expiration.
+- **Custom Alarm Sounds**: Future consideration - allow users to restart/choose the sound played when the timer ends (instead of the default notification sound).
+
 ## Technical Research: Background Execution (Android)
 
 ### 1. Foreground Service (FGS)

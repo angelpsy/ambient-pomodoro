@@ -49,7 +49,7 @@
 - [x] Core FSM (idle/focus/break/cycle logic)
 - [x] Hybrid scheduling (JS Engine + Android AlarmManager)
 - [x] Notifications logic (JS ↔ Native signals)
-- [ ] Soft ambient sound player
+- [x] Notifications logic (JS ↔ Native signals)
 
 ### 2. UI/UX
 - [x] Minimal React Native UI (display mode/time, controls, no settings screen)
@@ -97,7 +97,7 @@
 - [ ] Battery optimization hints (non-intrusive).
 
 ### 5. Robustness
-- [ ] Better state persistence.
+- [x] Better state persistence (Logs synchronized to file).
 - [ ] Restore timer after process death (best effort).
 - [ ] Improved error logging.
 
@@ -108,7 +108,7 @@
 
 ### Ambient Enhancements
 - Adaptive signal volume (based on environment).
-- Sound design exploration.
+- Sound design exploration (Custom Alarm Sounds).
 - Visual dimming modes.
 
 ### UX Experiments
