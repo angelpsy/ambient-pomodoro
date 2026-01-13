@@ -6,6 +6,7 @@ import {
 import { ITimerEngine } from './TimerEngine';
 import { logger } from './LoggerImpl';
 import { nativeTimer } from './NativeTimer';
+import { TimerStateStorage } from './TimerStateStorage';
 import { NativeEventEmitter, NativeModules } from 'react-native';
 
 const { TimerNativeModule } = NativeModules;
@@ -52,7 +53,63 @@ export class TimerEngineImpl implements ITimerEngine {
             }
         });
 
-        logger.info('TimerEngine initialized in IDLE mode');
+        logger.info('TimerEngine instantiated');
+    }
+
+    public async initialize(): Promise<void> {
+        logger.info('TimerEngine initializing persistence...');
+        const savedState = await TimerStateStorage.load();
+
+        if (!savedState) {
+            logger.info('No saved state found. Starting fresh.');
+            return;
+        }
+
+        logger.info(`Restoring saved state: ${savedState.currentMode}`);
+
+        // Restore context basics
+        this.context = { ...savedState };
+
+        const now = Date.now();
+
+        if (this.context.currentMode === TimerMode.IDLE) {
+            // Nothing to do
+        } else if (this.context.currentMode === TimerMode.PAUSED) {
+            // Already paused, just ensure we have the right display
+            logger.info('Restored in PAUSED state');
+        } else {
+            // Running state (FOCUS, BREAK, LONG_BREAK)
+            if (this.context.targetTimestamp) {
+                const delta = this.context.targetTimestamp - now;
+                // delta is remaining time. Can be negative if expired.
+
+                logger.info(`Restoring Active state. Remaining: ${delta}ms`);
+                this.context.remainingTime = delta;
+                this.context.elapsedTime = DURATIONS[this.context.currentMode] - delta;
+
+                // Always start ticking to keep updating UI (overtime or running)
+                this.startTicking();
+
+                if (delta > 0) {
+                    // Still have time left, ensure alarm is scheduled
+                    nativeTimer.scheduleAlarm(this.context.targetTimestamp, this.context.currentMode)
+                        .catch(e => logger.error(`Failed to reschedule alarm on restore: ${e}`));
+                } else {
+                    // Already expired.
+                    logger.info('Restored state is OVERTIME.');
+                    // We don't trigger handleTimeElapsed here because we might have already notified user 
+                    // when it originally happened (if app was alive) or we missed it.
+                    // But strictly speaking, if we just opened and it's expired, we probably saw the notification/sound?
+                    // Or if the app was killed, maybe not?
+                    // For V0, let's just let it tick into negative numbers (UI shows > 25:00).
+                }
+            }
+        }
+        this.emitChange();
+    }
+
+    private persistState(): void {
+        TimerStateStorage.save(this.context);
     }
 
     public getState(): TimerContext {
@@ -79,6 +136,7 @@ export class TimerEngineImpl implements ITimerEngine {
 
         this.transitionTo(TimerMode.FOCUS);
         this.startTicking();
+        this.persistState();
     }
 
     public pause(): void {
@@ -93,6 +151,7 @@ export class TimerEngineImpl implements ITimerEngine {
 
         logger.info('Timer PAUSED');
         this.emitChange();
+        this.persistState();
     }
 
     public resume(): void {
@@ -110,6 +169,7 @@ export class TimerEngineImpl implements ITimerEngine {
         this.context.targetTimestamp = Date.now() + this.context.remainingTime;
 
         this.startTicking();
+        this.persistState();
     }
 
     public stop(): void {
@@ -126,6 +186,7 @@ export class TimerEngineImpl implements ITimerEngine {
 
         logger.info('Timer STOPPED and RESET');
         this.emitChange();
+        this.persistState();
     }
 
     public next(): void {
@@ -145,6 +206,12 @@ export class TimerEngineImpl implements ITimerEngine {
         }
 
         this.startTicking();
+        // next() calls transitionTo inside, which calls persistState()
+        // But startTicking() doesn't.
+        // Also transitionTo is called BEFORE startTicking inside next().
+        // So state is persisted in transitionTo. 
+        // We only persist transitions. Ticks are not persisted (too frequent).
+        // That is fine.
     }
 
     public switchToFocus(): void {
@@ -210,6 +277,7 @@ export class TimerEngineImpl implements ITimerEngine {
         }
 
         this.emitChange();
+        this.persistState();
     }
 
     private startTicking(): void {

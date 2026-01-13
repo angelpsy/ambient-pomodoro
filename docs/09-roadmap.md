@@ -13,7 +13,7 @@
 
 ### 1. Core
 - [x] Define native timer engine boundary
-- [x] Define FSM interfaces (events, state, side effects)
+- [x] **State Persistence**: Save timer state (mode, time remaining) to disk to survive app kills.
 - [x] Decide timestamp-based timing model
 - [x] Define logging strategy (levels, sinks)
 

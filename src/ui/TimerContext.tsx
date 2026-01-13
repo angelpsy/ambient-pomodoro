@@ -22,6 +22,8 @@ export const TimerProvider: React.FC<TimerProviderProps> = ({ children }) => {
             setState(newState);
         });
 
+        engine.initialize();
+
         return () => unsubscribe();
     }, []);
 
