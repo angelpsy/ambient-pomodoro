@@ -36,6 +36,24 @@ export interface TimerContext {
     nextReminderTimestamp?: number; // When to send the next "nagging" signal if in overtime
 }
 
+export interface ModeDurationsMs {
+    focus: number;
+    break: number;
+    longBreak: number;
+}
+
+export interface ReminderIntervalsMs {
+    focus: number;
+    break: number;
+    longBreak: number;
+}
+
+export interface TimerSettings {
+    durationsMs: ModeDurationsMs;
+    reminderIntervalsMs: ReminderIntervalsMs;
+    cyclesBeforeLongBreak: number;
+}
+
 export type TimerListener = (context: TimerContext) => void;
 
 export enum LogLevel {

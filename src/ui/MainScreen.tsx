@@ -4,13 +4,15 @@ import { useTimer } from './useTimer';
 import { formatTime } from './utils';
 import { Controls } from './components/Controls';
 import { LogViewer } from './components/LogViewer';
+import { SettingsViewer } from './components/SettingsViewer';
 import { TimerMode } from '../core/types';
 
 import { logStore } from '../core/LogStore';
 
 export const MainScreen: React.FC = () => {
-    const { currentMode, elapsedTime, cycleCount } = useTimer();
+    const { currentMode, elapsedTime, cycleCount, settings, updateSettings } = useTimer();
     const [logsVisible, setLogsVisible] = React.useState(false);
+    const [settingsVisible, setSettingsVisible] = React.useState(false);
 
     React.useEffect(() => {
         logStore.initialize();
@@ -37,6 +39,12 @@ export const MainScreen: React.FC = () => {
                 <View style={styles.headerRight}>
                     <TouchableOpacity
                         style={styles.viewLogsButton}
+                        onPress={() => setSettingsVisible(true)}
+                    >
+                        <Text style={styles.viewLogsText}>SETTINGS</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.viewLogsButton}
                         onPress={() => setLogsVisible(true)}
                     >
                         <Text style={styles.viewLogsText}>VIEW LOGS</Text>
@@ -47,6 +55,12 @@ export const MainScreen: React.FC = () => {
             <LogViewer
                 visible={logsVisible}
                 onClose={() => setLogsVisible(false)}
+            />
+            <SettingsViewer
+                visible={settingsVisible}
+                settings={settings}
+                onClose={() => setSettingsVisible(false)}
+                onSave={updateSettings}
             />
 
             <View style={styles.mainContent}>
@@ -86,7 +100,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     viewLogsButton: {
-        marginRight: 10,
+        marginRight: 8,
         paddingHorizontal: 10,
         paddingVertical: 6,
         backgroundColor: '#1E1E1E',

@@ -1,4 +1,4 @@
-import { TimerContext, TimerMode } from './types';
+import { TimerContext } from './types';
 import { nativeFileStorage } from './NativeFileStorage';
 import { logger } from './LoggerImpl';
 

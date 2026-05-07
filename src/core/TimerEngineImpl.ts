@@ -2,11 +2,13 @@ import {
     TimerContext,
     TimerMode,
     TimerListener,
+    TimerSettings,
 } from './types';
 import { ITimerEngine } from './TimerEngine';
 import { logger } from './LoggerImpl';
 import { nativeTimer } from './NativeTimer';
 import { TimerStateStorage } from './TimerStateStorage';
+import { TimerSettingsStorage } from './TimerSettingsStorage';
 import { NativeEventEmitter, NativeModules } from 'react-native';
 
 const { TimerNativeModule } = NativeModules;
@@ -17,16 +19,23 @@ const timerEmitter = TimerNativeModule ? new NativeEventEmitter(TimerNativeModul
  * Durations in milliseconds for V0.
  * As per docs/02-requirements.md
  */
-const DURATIONS = {
-    [TimerMode.FOCUS]: 25 * 60 * 1000,
-    [TimerMode.BREAK]: 5 * 60 * 1000,
-    [TimerMode.LONG_BREAK]: 15 * 60 * 1000,
-    [TimerMode.IDLE]: 0,
-    [TimerMode.PAUSED]: 0,
+const DEFAULT_SETTINGS: TimerSettings = {
+    durationsMs: {
+        focus: 25 * 60 * 1000,
+        break: 5 * 60 * 1000,
+        longBreak: 15 * 60 * 1000,
+    },
+    reminderIntervalsMs: {
+        focus: 25 * 60 * 1000,
+        break: 5 * 60 * 1000,
+        longBreak: 15 * 60 * 1000,
+    },
+    cyclesBeforeLongBreak: 4,
 };
 
 export class TimerEngineImpl implements ITimerEngine {
     private context: TimerContext;
+    private settings: TimerSettings = { ...DEFAULT_SETTINGS };
     private listeners: Set<TimerListener> = new Set();
     private intervalId: ReturnType<typeof setInterval> | null = null;
 
@@ -57,6 +66,11 @@ export class TimerEngineImpl implements ITimerEngine {
     }
 
     public async initialize(): Promise<void> {
+        const savedSettings = await TimerSettingsStorage.load();
+        if (savedSettings) {
+            this.settings = this.normalizeSettings(savedSettings);
+        }
+
         logger.info('TimerEngine initializing persistence...');
         const savedState = await TimerStateStorage.load();
 
@@ -85,7 +99,7 @@ export class TimerEngineImpl implements ITimerEngine {
 
                 logger.info(`Restoring Active state. Remaining: ${delta}ms`);
                 this.context.remainingTime = delta;
-                this.context.elapsedTime = DURATIONS[this.context.currentMode] - delta;
+                this.context.elapsedTime = this.getDurationForMode(this.context.currentMode) - delta;
 
                 // Always start ticking to keep updating UI (overtime or running)
                 this.startTicking();
@@ -114,6 +128,35 @@ export class TimerEngineImpl implements ITimerEngine {
 
     public getState(): TimerContext {
         return { ...this.context };
+    }
+
+    public getSettings(): TimerSettings {
+        return {
+            ...this.settings,
+            durationsMs: { ...this.settings.durationsMs },
+            reminderIntervalsMs: { ...this.settings.reminderIntervalsMs },
+        };
+    }
+
+    public updateSettings(nextSettings: Partial<TimerSettings>): void {
+        const merged: TimerSettings = this.normalizeSettings({
+            ...this.settings,
+            ...nextSettings,
+            durationsMs: {
+                ...this.settings.durationsMs,
+                ...nextSettings.durationsMs,
+            },
+            reminderIntervalsMs: {
+                ...this.settings.reminderIntervalsMs,
+                ...nextSettings.reminderIntervalsMs,
+            },
+        });
+        this.settings = merged;
+        TimerSettingsStorage.save(merged);
+        logger.info('Timer settings updated');
+
+        this.realignCurrentModeAfterSettingsChange();
+        this.emitChange();
     }
 
     public subscribe(callback: TimerListener): () => void {
@@ -197,7 +240,8 @@ export class TimerEngineImpl implements ITimerEngine {
             this.context.cycleCount++;
             logger.info(`Focus session completed (manual). Cycle count: ${this.context.cycleCount}`);
 
-            const isLongBreak = this.context.cycleCount > 0 && this.context.cycleCount % 4 === 0;
+            const isLongBreak = this.context.cycleCount > 0
+                && this.context.cycleCount % this.settings.cyclesBeforeLongBreak === 0;
             this.transitionTo(isLongBreak ? TimerMode.LONG_BREAK : TimerMode.BREAK);
         } else if (current === TimerMode.BREAK || current === TimerMode.LONG_BREAK) {
             this.transitionTo(TimerMode.FOCUS);
@@ -244,7 +288,7 @@ export class TimerEngineImpl implements ITimerEngine {
 
     private transitionTo(mode: TimerMode): void {
         const prev = this.context.currentMode;
-        const duration = DURATIONS[mode];
+        const duration = this.getDurationForMode(mode);
 
         logger.info(`Transition: ${prev} -> ${mode} (Duration: ${duration}ms)`);
 
@@ -302,13 +346,13 @@ export class TimerEngineImpl implements ITimerEngine {
         }
 
         const now = Date.now();
-        const startTime = (this.context.targetTimestamp || now) - DURATIONS[this.context.currentMode];
+        const startTime = (this.context.targetTimestamp || now) - this.getDurationForMode(this.context.currentMode);
 
         // Elapsed time calculation: how much has passed since the mode started
         const elapsed = now - startTime;
 
         // Remaining time calculation
-        const duration = DURATIONS[this.context.currentMode];
+        const duration = this.getDurationForMode(this.context.currentMode);
         const remaining = duration - elapsed;
 
         const crossedZero = this.context.remainingTime > 0 && remaining <= 0;
@@ -334,9 +378,8 @@ export class TimerEngineImpl implements ITimerEngine {
         const mode = this.context.currentMode;
         if (mode === TimerMode.IDLE || mode === TimerMode.PAUSED) return;
 
-        // Constraint: not more often than once a minute
-        const modeDuration = DURATIONS[mode];
-        const reminderInterval = Math.max(modeDuration, 60 * 1000);
+        const modeDuration = this.getDurationForMode(mode);
+        const reminderInterval = this.getReminderIntervalForMode(mode);
 
         const nextTime = Date.now() + reminderInterval;
 
@@ -346,5 +389,62 @@ export class TimerEngineImpl implements ITimerEngine {
         // Schedule next exact alarm
         nativeTimer.scheduleAlarm(nextTime, mode)
             .catch((e: any) => logger.error(`Failed to schedule reminder alarm: ${e}`));
+    }
+
+    private getDurationForMode(mode: TimerMode): number {
+        if (mode === TimerMode.FOCUS) return this.settings.durationsMs.focus;
+        if (mode === TimerMode.BREAK) return this.settings.durationsMs.break;
+        if (mode === TimerMode.LONG_BREAK) return this.settings.durationsMs.longBreak;
+        return 0;
+    }
+
+    private getReminderIntervalForMode(mode: TimerMode): number {
+        if (mode === TimerMode.FOCUS) return this.settings.reminderIntervalsMs.focus;
+        if (mode === TimerMode.BREAK) return this.settings.reminderIntervalsMs.break;
+        if (mode === TimerMode.LONG_BREAK) return this.settings.reminderIntervalsMs.longBreak;
+        return 0;
+    }
+
+    private normalizeSettings(settings: TimerSettings): TimerSettings {
+        const minMs = 60 * 1000;
+        const minCycles = 1;
+
+        return {
+            durationsMs: {
+                focus: Math.max(settings.durationsMs.focus, minMs),
+                break: Math.max(settings.durationsMs.break, minMs),
+                longBreak: Math.max(settings.durationsMs.longBreak, minMs),
+            },
+            reminderIntervalsMs: {
+                focus: Math.max(settings.reminderIntervalsMs.focus, minMs),
+                break: Math.max(settings.reminderIntervalsMs.break, minMs),
+                longBreak: Math.max(settings.reminderIntervalsMs.longBreak, minMs),
+            },
+            cyclesBeforeLongBreak: Math.max(settings.cyclesBeforeLongBreak, minCycles),
+        };
+    }
+
+    private realignCurrentModeAfterSettingsChange(): void {
+        const mode = this.context.currentMode;
+        if (mode === TimerMode.IDLE) return;
+
+        if (mode === TimerMode.PAUSED && this.context.previousMode) {
+            const duration = this.getDurationForMode(this.context.previousMode);
+            this.context.remainingTime = duration - this.context.elapsedTime;
+            return;
+        }
+
+        const duration = this.getDurationForMode(mode);
+        this.context.remainingTime = duration - this.context.elapsedTime;
+        this.context.targetTimestamp = Date.now() + this.context.remainingTime;
+
+        nativeTimer.scheduleAlarm(this.context.targetTimestamp, mode)
+            .catch((e: any) => logger.error(`Failed to reschedule alarm after settings update: ${e}`));
+
+        if (this.context.remainingTime <= 0) {
+            this.scheduleNextReminder();
+        }
+
+        this.persistState();
     }
 }

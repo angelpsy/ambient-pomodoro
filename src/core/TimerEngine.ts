@@ -1,4 +1,4 @@
-import { TimerContext, TimerListener } from './types';
+import { TimerContext, TimerListener, TimerSettings } from './types';
 
 /**
  * ITimerEngine represents the core logic boundary.
@@ -47,4 +47,14 @@ export interface ITimerEngine {
      * Synchronous access to current state.
      */
     getState(): TimerContext;
+
+    /**
+     * Current user-configurable settings.
+     */
+    getSettings(): TimerSettings;
+
+    /**
+     * Merge and apply settings update.
+     */
+    updateSettings(nextSettings: Partial<TimerSettings>): void;
 }

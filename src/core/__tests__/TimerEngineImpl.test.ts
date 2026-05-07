@@ -124,4 +124,29 @@ describe('TimerEngineImpl', () => {
         expect(state.elapsedTime).toBe(0);
         expect(state.cycleCount).toBe(0);
     });
+
+    test('updateSettings() should affect next transition duration', () => {
+        engine.updateSettings({
+            durationsMs: {
+                focus: 10 * 60 * 1000,
+                break: 3 * 60 * 1000,
+                longBreak: 20 * 60 * 1000,
+            },
+        });
+
+        engine.start();
+        expect(engine.getState().remainingTime).toBe(10 * 60 * 1000);
+        engine.next();
+        expect(engine.getState().remainingTime).toBe(3 * 60 * 1000);
+    });
+
+    test('updateSettings() should apply custom cycle threshold for long break', () => {
+        engine.updateSettings({ cyclesBeforeLongBreak: 2 });
+        engine.start();
+        engine.next(); // cycle 1 => BREAK
+        engine.next(); // FOCUS
+        engine.next(); // cycle 2 => LONG_BREAK
+
+        expect(engine.getState().currentMode).toBe(TimerMode.LONG_BREAK);
+    });
 });
